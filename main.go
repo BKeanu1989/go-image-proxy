@@ -1,13 +1,17 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"image"
+	"image/gif"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
+	"path"
 
 	"example.com/image-proxy/myimage"
 	"github.com/sunshineplan/imgconv"
@@ -15,42 +19,38 @@ import (
 
 // TODO: key & salt for signing
 
-// http server
-// quality, width, height, convert
-
 // sha?
 // cache - fs &/ memory => hash map[hash of filename] = base64 || with max size for fs & memory
 
-// wordpress shortcode für bilder? mit js für dynamische größen
-const foo = "http://localhost:5555/images?url={x}&w=500&h=500&q=80"
+// "http://localhost:8090/images?url=http://localhost:3333/&w=500&h=500&q=80"
 
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /image/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "got image\n")
+		opts := myimage.UrlParser(r.URL.RequestURI())
 
-		myUrl, _ := url.Parse(foo)
-		params, _ := url.ParseQuery(myUrl.RawQuery)
-		fmt.Println(params)
+		fmt.Printf("%v", opts)
 
-		// TODO: use params for image options
-		// work on image with options
-		// maybe save on disk?
+		dwlImage, err := downloadImage(opts.OriginalUrl)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-		// urlString := r.URL.String()
+		src, err := resizeNQualityImage(dwlImage, opts)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-		// fmt.Println("%s", urlString)
+		buf, err := os.ReadFile(src)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// set header according to image format
+		w.Header().Set("Content-Type", "image/png")
+		w.Write(buf)
 
 	})
-
-	opts := myimage.Options{
-		Width:   200,
-		Height:  200,
-		Quality: 80,
-	}
-	resizeNQualityImage("./example/images/4.png", opts)
-
-	fmt.Println("Image downloaded successfully")
 
 	mux.HandleFunc("/task/{id}/", func(w http.ResponseWriter, r *http.Request) {
 		id := r.PathValue("id")
@@ -60,49 +60,43 @@ func main() {
 	http.ListenAndServe("localhost:8090", mux)
 }
 
-func downloadImage(path string) {
-
-	// imageUrl := "https://example.com/image.jpg"
-
-	// Send HTTP GET request
-	response, err := http.Get(path)
+func downloadImage(p string) (string, error) {
+	ext := path.Ext(p)
+	tmpFileName := "./out/" + base64Encode(p) + "." + ext
+	if ext == "" {
+		log.Fatal("No Extension seen in request url")
+	}
+	response, err := http.Get(p)
 	if err != nil {
 		fmt.Println("Error fetching image:", err)
-		return
+		return "", err
 	}
 	defer response.Body.Close()
 
-	// Create the file where the image will be saved
-	file, err := os.Create("image.jpg")
+	file, err := os.Create(tmpFileName)
 	if err != nil {
 		fmt.Println("Error creating file:", err)
-		return
+		return "", err
 	}
 	defer file.Close()
 
-	// Copy the response body to the file
 	_, err = io.Copy(file, response.Body)
 	if err != nil {
 		fmt.Println("Error saving image:", err)
-		return
+		return "", err
 	}
+
+	return tmpFileName, nil
 }
 
-func resizeNQualityImage(srcPath string, opt myimage.Options) {
-	src, err := imgconv.Open("./example/images/4.png")
+func resizeNQualityImage(srcPath string, opt myimage.MyOptions) (string, error) {
+	src, err := imgconv.Open(srcPath)
 	var mark image.Image
 	if err != nil {
 		log.Fatalf("failed to open image: %v", err)
 	}
 
-	if opt.Width != 0 {
-		mark = imgconv.Resize(src, &imgconv.ResizeOption{Width: int(opt.Width)})
-	}
-
-	if opt.Height != 0 {
-		mark = imgconv.Resize(src, &imgconv.ResizeOption{Height: int(opt.Height)})
-
-	}
+	mark = imgconv.Resize(src, &imgconv.ResizeOption{Height: int(opt.Height), Width: int(opt.Width)})
 
 	if opt.Quality != 0 {
 		imgconv.Quality(opt.Quality)
@@ -111,19 +105,44 @@ func resizeNQualityImage(srcPath string, opt myimage.Options) {
 	// resizedImage := imaging.Resize(src, 300, 200, imaging.Lanczos)
 
 	// Save the resized image to a file
-	err = imgconv.Save("output.jpg", mark, &imgconv.FormatOption{Format: imgconv.PNG})
+	outFile := "./out/" + base64Encode(srcPath) + ".png"
+
+	err = imgconv.Save(outFile, mark, &imgconv.FormatOption{Format: imgconv.PNG})
 	if err != nil {
 		panic(err)
 	}
 
-	// Resize the image to width = 200px preserving the aspect ratio.
+	return outFile, nil
 
-	// Add random watermark set opacity = 128.
-	// dst := imgconv.Watermark(src, &imgconv.WatermarkOption{Mark: mark, Opacity: 128, Random: true})
+}
 
-	// Write the resulting image as TIFF.
-	// err = imgconv.Write(io.Discard, mark, &imgconv.FormatOption{Format: imgconv.PNG})
-	// if err != nil {
-	// 	log.Fatalf("failed to write image: %v", err)
-	// }
+func base64Encode(str string) string {
+	return base64.StdEncoding.EncodeToString([]byte(str))
+}
+
+func base64Decode(str string) (string, bool) {
+	data, err := base64.StdEncoding.DecodeString(str)
+	if err != nil {
+		return "", true
+	}
+	return string(data), false
+}
+
+func encodeImage(filename string, img image.Image, format string) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	switch format {
+	case "jpeg", "jpg":
+		return jpeg.Encode(file, img, nil)
+	case "png":
+		return png.Encode(file, img)
+	case "gif":
+		return gif.Encode(file, img, nil)
+	default:
+		return fmt.Errorf("unsupported format: %s", format)
+	}
 }
