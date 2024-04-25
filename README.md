@@ -35,3 +35,22 @@ fmt.Println(params)
 ```tip
 The imgproxy URL in this example is not signed but signing URLs is especially important when using encrypted source URLs to prevent a padding oracle attack.
 ```
+
+
+---
+TODO: 
+
+- dynamic image formats
+- caching redislike?
+- logger
+- go routine?
+  
+---
+DONE:
+
+- only width changes -> grow/shrink height accordingly | preserving aspect ratio
+
+---
+
+
+dont grow bigger than "root" image

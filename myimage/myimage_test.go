@@ -5,7 +5,7 @@ import (
 )
 
 func TestUrlParser(t *testing.T) {
-	foo := "https://test.foo/image/?url=http://localhost:3000&w=500&h=400&q=80"
+	foo := "https://test.foo/image/?url=http://localhost:3000&w=500&h=400&q=80&f=png"
 
 	opts := UrlParser(foo)
 
@@ -27,6 +27,11 @@ func TestUrlParser(t *testing.T) {
 	expectedUrl := "http://localhost:3000"
 	if opts.OriginalUrl != expectedUrl {
 		t.Fatalf("Original Url should be %s, but is %s", expectedUrl, opts.OriginalUrl)
+	}
+
+	expectedFormat := "png"
+	if opts.Format != expectedFormat {
+		t.Fatalf("Expected format should be %s but is %s", expectedFormat, opts.Format)
 	}
 }
 

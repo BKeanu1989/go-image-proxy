@@ -16,17 +16,6 @@ type MyOptions struct {
 	Width  float64
 	Height float64
 
-	// If true, resize the image to fit in the specified dimensions.  Image
-	// will not be cropped, and aspect ratio will be maintained.
-	Fit bool
-
-	// Rotate image the specified degrees counter-clockwise.  Valid values
-	// are 90, 180, 270.
-	Rotate int
-
-	FlipVertical   bool
-	FlipHorizontal bool
-
 	// Quality of output image
 	Quality int
 
@@ -35,7 +24,7 @@ type MyOptions struct {
 
 	OriginalUrl string
 
-	// Desired image format. Valid values are "jpeg", "png", "tiff".
+	// Desired image format. Valid values are "jpeg", "png".
 	Format string
 }
 
@@ -60,6 +49,7 @@ func UrlParser(path string) MyOptions {
 	var w, h float64
 	var q int
 	var urlVal string
+	var f string
 
 	myUrl, _ := url.Parse(path)
 	params, _ := url.ParseQuery(myUrl.RawQuery)
@@ -89,11 +79,26 @@ func UrlParser(path string) MyOptions {
 		urlVal = val[0]
 	}
 
+	val, ok := params["f"]
+	if ok {
+		switch val[0] {
+		case "jpeg", "jpg":
+			f = "jpeg"
+		case "png":
+			f = "png"
+		default:
+			f = "jpeg"
+		}
+	} else {
+		f = "jpeg"
+	}
+
 	opt := MyOptions{
 		Width:       w,
 		Height:      h,
 		Quality:     q,
 		OriginalUrl: urlVal,
+		Format:      f,
 	}
 
 	return opt

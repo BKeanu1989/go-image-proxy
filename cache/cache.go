@@ -1,5 +1,11 @@
 package cache
 
+// import (
+// 	"fmt"
+// 	"github.com/patrickmn/go-cache"
+// 	"time"
+// )
+
 // type Cache struct {
 // }
 
