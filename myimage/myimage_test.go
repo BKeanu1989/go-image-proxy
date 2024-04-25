@@ -38,7 +38,8 @@ func TestGetFileName(t *testing.T) {
 		OriginalUrl: "https://kunststoffplattenprofis.de/wp-content/uploads/2021/02/Titel-Test1.png",
 	}
 
-	if foo.getFileName() != "Titel-Test1--w-400-h-500-q-90.png" {
-		t.Fatalf("Is not the supposed file name")
+	expectedVal := foo.GetFileName()
+	if expectedVal != "Titel-Test1--w-400-h-500-q-90.png" {
+		t.Fatalf("Is not the supposed file name: %s", expectedVal)
 	}
 }

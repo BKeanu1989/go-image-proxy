@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"path"
 	"strconv"
+	"strings"
 	// "net/url"
 )
 
@@ -38,14 +39,20 @@ type MyOptions struct {
 	Format string
 }
 
-func (opts MyOptions) getFileName() string {
+func (opts MyOptions) GetFileName() string {
+
 	base := path.Base(opts.OriginalUrl)
-	ext := path.Ext(opts.OriginalUrl)
-	clean := path.Clean(opts.OriginalUrl)
+	s := strings.Split(base, ".")
 
-	fmt.Printf("%s - ext: %s, clean: %s", base, ext, clean)
+	// ext := path.Ext(opts.OriginalUrl)
 
-	return ""
+	wi := strconv.FormatFloat(opts.Width, 'f', 0, 64)
+	hi := strconv.FormatFloat(opts.Height, 'f', 0, 64)
+	qi := strconv.FormatInt(int64(opts.Quality), 10)
+	s[0] += "--" + "w-" + wi + "-h-" + hi + "-q-" + qi
+
+	fmt.Printf("%v", s)
+	return strings.Join(s, ".")
 
 }
 

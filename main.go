@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"time"
 
 	"example.com/image-proxy/myimage"
 	"github.com/sunshineplan/imgconv"
@@ -24,12 +25,15 @@ import (
 
 // "http://localhost:8090/images?url=http://localhost:3333/&w=500&h=500&q=80"
 
+// http://localhost:8090/images?url=http://kunststoffplattenprofis.de/&w=500&h=500&q=80
+
+// http://localhost:8090/image/?url=https://kunststoffplattenprofis.de/wp-content/uploads/2021/10/Titel-Test1.png&w=500&h=500&q=4
+
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /image/", func(w http.ResponseWriter, r *http.Request) {
+		defer timer("image conversion")()
 		opts := myimage.UrlParser(r.URL.RequestURI())
-
-		fmt.Printf("%v", opts)
 
 		dwlImage, err := downloadImage(opts.OriginalUrl)
 		if err != nil {
@@ -62,7 +66,7 @@ func main() {
 
 func downloadImage(p string) (string, error) {
 	ext := path.Ext(p)
-	tmpFileName := "./out/" + base64Encode(p) + "." + ext
+	tmpFileName := "./base/" + base64Encode(p) + "." + ext
 	if ext == "" {
 		log.Fatal("No Extension seen in request url")
 	}
@@ -105,7 +109,7 @@ func resizeNQualityImage(srcPath string, opt myimage.MyOptions) (string, error) 
 	// resizedImage := imaging.Resize(src, 300, 200, imaging.Lanczos)
 
 	// Save the resized image to a file
-	outFile := "./out/" + base64Encode(srcPath) + ".png"
+	outFile := "./out/" + opt.GetFileName()
 
 	err = imgconv.Save(outFile, mark, &imgconv.FormatOption{Format: imgconv.PNG})
 	if err != nil {
@@ -145,4 +149,21 @@ func encodeImage(filename string, img image.Image, format string) error {
 	default:
 		return fmt.Errorf("unsupported format: %s", format)
 	}
+}
+
+func timer(name string) func() {
+	start := time.Now()
+	return func() {
+		fmt.Printf("%s took %v\n", name, time.Since(start))
+	}
+}
+
+func foundImageInFs(opts myimage.MyOptions) (image.Image, error) {
+	// f, err :=
+	f, err := os.Open(opts.GetFileName())
+	if err != nil {
+		return nil, err
+	}
+	image, _, err := image.Decode(f)
+	return image, err
 }
