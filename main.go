@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"example.com/image-proxy/myimage"
@@ -30,7 +31,7 @@ import (
 // http://localhost:8090/images?url=http://kunststoffplattenprofis.de/&w=500&h=500&q=80
 
 // http://localhost:8090/image/?url=https://kunststoffplattenprofis.de/wp-content/uploads/2021/10/Titel-Test1.png&w=500&h=500&q=4
-
+// http://localhost:8090/image/?url=http://localhost:8080/wp-content/uploads/2022/07/Tobias-Kasimirowicz_%C2%A9Jacqueline-Schulz-9.jpg&w=215q=80&f=jpeg
 func main() {
 	mux := http.NewServeMux()
 
@@ -121,7 +122,7 @@ func main() {
 
 func downloadImage(p string) (string, error) {
 	ext := path.Ext(p)
-	tmpFileName := "./base/" + base64Encode(p) + "." + ext
+	tmpFileName := "./base/" + strings.Replace(base64Encode(p), "/", "", -1) + "." + ext
 	if ext == "" {
 		log.Fatal("No Extension seen in request url")
 	}

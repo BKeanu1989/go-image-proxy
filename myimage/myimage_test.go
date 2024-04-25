@@ -35,6 +35,34 @@ func TestUrlParser(t *testing.T) {
 	}
 }
 
+func TestUrlParser2(t *testing.T) {
+	foo := "http://localhost:8090/image/?url=http://localhost:8080/wp-content/uploads/2022/07/Tobias-Kasimirowicz_%C2%A9Jacqueline-Schulz-9.jpg&w=215&q=80&f=jpeg"
+
+	opts := UrlParser(foo)
+
+	expectedWidth := 215.0
+	if opts.Width != expectedWidth {
+		t.Fatalf("Width should be %f, but is %f", expectedWidth, opts.Width)
+	}
+
+	expectedQuality := 80
+	if opts.Quality != expectedQuality {
+		t.Fatalf("Width should be %d, but is %d", expectedQuality, opts.Quality)
+	}
+
+	expectedUrl := "http://localhost:8080/wp-content/uploads/2022/07/Tobias-Kasimirowicz_©Jacqueline-Schulz-9.jpg"
+	if opts.OriginalUrl != expectedUrl {
+		t.Fatalf("Original Url should be %s, but is %s", expectedUrl, opts.OriginalUrl)
+	}
+
+	expectedFormat := "jpeg"
+	if opts.Format != expectedFormat {
+		t.Fatalf("Expected format should be %s but is %s", expectedFormat, opts.Format)
+	}
+}
+
+//
+
 func TestGetFileName(t *testing.T) {
 
 	foo := MyOptions{Width: 400,
