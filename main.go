@@ -160,6 +160,10 @@ func resizeNQualityImage(srcPath string, opt myimage.MyOptions) (string, error) 
 		log.Fatalf("failed to open image: %v", err)
 	}
 
+	if opt.Quality != 0 {
+		imgconv.Quality(opt.Quality)
+	}
+
 	if opt.Height != 0.0 {
 		if opt.Width != 0.0 {
 			mark = imgconv.Resize(src, &imgconv.ResizeOption{Height: int(opt.Height), Width: int(opt.Width)})
@@ -170,17 +174,15 @@ func resizeNQualityImage(srcPath string, opt myimage.MyOptions) (string, error) 
 		mark = imgconv.Resize(src, &imgconv.ResizeOption{Width: int(opt.Width)})
 	}
 
-	if opt.Quality != 0 {
-		imgconv.Quality(opt.Quality)
-	}
-
 	// resizedImage := imaging.Resize(src, 300, 200, imaging.Lanczos)
 
 	// Save the resized image to a file
 	outFile := "./out/" + opt.GetFileName()
 
+	err = encodeImage(outFile, mark, opt.Format, opt.Quality)
+
 	// TODO: support more image formats
-	err = imgconv.Save(outFile, mark, &imgconv.FormatOption{Format: imgconv.PNG})
+	// err = imgconv.Save(outFile, mark, &imgconv.FormatOption{Format: imgconv.JPEG})
 	if err != nil {
 		panic(err)
 	}
@@ -201,7 +203,7 @@ func base64Decode(str string) (string, bool) {
 	return string(data), false
 }
 
-func encodeImage(filename string, img image.Image, format string) error {
+func encodeImage(filename string, img image.Image, format string, quality int) error {
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -210,7 +212,8 @@ func encodeImage(filename string, img image.Image, format string) error {
 
 	switch format {
 	case "jpeg", "jpg":
-		return jpeg.Encode(file, img, nil)
+		fmt.Printf("chosen file format is jpeg and should apply quality of %d", quality)
+		return jpeg.Encode(file, img, &jpeg.Options{Quality: quality})
 	case "png":
 		return png.Encode(file, img)
 	case "gif":

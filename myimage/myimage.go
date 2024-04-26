@@ -39,7 +39,7 @@ func (opts MyOptions) GetFileName() string {
 	hi := strconv.FormatFloat(opts.Height, 'f', 0, 64)
 	qi := strconv.FormatInt(int64(opts.Quality), 10)
 	s[0] += "--" + "w-" + wi + "-h-" + hi + "-q-" + qi
-
+	s[1] = opts.Format
 	fmt.Printf("%v", s)
 	return strings.Join(s, ".")
 
@@ -70,9 +70,14 @@ func UrlParser(path string) MyOptions {
 
 	if val, ok := params["q"]; ok {
 		qv, err := strconv.Atoi(val[0])
+		// fmt.Printf("quality is %d", qv)
 		if err == nil {
 			q = qv
 		}
+
+	} else {
+
+		q = 80
 	}
 
 	if val, ok := params["url"]; ok {

@@ -30,7 +30,7 @@ Serve a "native" version as well.
 ## Done
 
 ## Known Issues
-
+- Quality only available for jpeg
 
 ---
     - Implement a proxy layer in Golang.
