@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"image"
 	"image/gif"
@@ -112,14 +113,15 @@ func main() {
 
 	})
 
-	mux.HandleFunc("/task/{id}/", func(w http.ResponseWriter, r *http.Request) {
-		id := r.PathValue("id")
-		fmt.Fprintf(w, "handling task with id=%v\n", id)
+	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+		p := struct{}{}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(p)
 	})
 
 	port := "8090"
 	fmt.Printf("Starting server on port %v\n", port)
-	http.ListenAndServe("localhost:" + port, mux)
+	http.ListenAndServe("localhost:"+port, mux)
 }
 
 func downloadImage(p string) (string, error) {
