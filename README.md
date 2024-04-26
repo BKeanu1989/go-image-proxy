@@ -209,3 +209,31 @@ If you like this post, please do like and add your comments and follow my page f
 https://medium.com/@quicktechlearn/go-an-evolving-language-in-this-modern-era-b5d4e58dd838
 https://medium.com/@quicktechlearn/how-slices-affect-the-performance-of-your-code-in-go-how-can-they-be-mitigated-9e6f3d90e2e6
 https://medium.com/@quicktechlearn/how-to-sync-goroutines-in-go-how-to-use-wait-groups-7fef6741950
+
+
+
+---
+docker notes
+https://www.youtube.com/watch?v=DM65_JyGxCo
+
+docker network create NAME_OF_NETWORK --subnet 192.168.92.0/24
+
+
+in docker-compose file
+```yml
+... # (webservices)
+    website:
+        ports:
+            - "3000:8080"
+        restart: always
+        networks:
+            NAME_OF_NETWORK:
+                ipv4_address: 192.168.92.21
+    ports
+networks:
+    NAME_OF_NETWORK:
+        ipam:
+            driver: default
+            config:
+                - subnet: "192.168.92.0/24"
+```
