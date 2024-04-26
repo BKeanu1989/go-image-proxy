@@ -117,7 +117,9 @@ func main() {
 		fmt.Fprintf(w, "handling task with id=%v\n", id)
 	})
 
-	http.ListenAndServe("localhost:8090", mux)
+	port := "8090"
+	fmt.Printf("Starting server on port %v\n", port)
+	http.ListenAndServe("localhost:" + port, mux)
 }
 
 func downloadImage(p string) (string, error) {

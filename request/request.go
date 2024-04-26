@@ -9,6 +9,6 @@ import (
 
 type Request struct {
 	URL      *url.URL          // URL of the image to proxy
-	Options  myimage.MyOptions // Image transformation to perform
+	// Options  myimage.MyOptions // Image transformation to perform
 	Original *http.Request     // The original HTTP request
 }
