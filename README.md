@@ -24,6 +24,8 @@ Serve a "native" version as well.
     - Cache Memory Size auto clean
     - How to build url?
     - URL Signing
+    - link rel=preconnect
+    - http2
 
 ## Done
 
@@ -65,3 +67,92 @@ dont grow bigger than "root" image
 # Components Todo:
 - max width and height(?)
 - fallback
+
+
+---
+## Go memory usage with maps
+While using maps in Go, we need to understand some important characteristics of how a map grows and shrinks. Does really maps shrink?
+
+Let’s see with a example, consider a scenario while implementing a map as follows
+
+m := make(map[int][128]byte)
+Each value of m is an array of 128 bytes. We will do the following:
+
+Allocate an empty map.
+Add 1 million elements.
+Remove all the elements, and run a Garbage Collection (GC).
+After each step, print the size of the heap (using a printMemAlloc utility function). This shows us how this example behaves memory-wise:
+
+```go
+package main
+
+import (
+ "fmt"
+ "runtime"
+)
+
+func main() {
+ n := 1000000
+ m := make(map[int][128]byte)
+ printMemAlloc()
+
+ for i := 0; i < n; i++ { 
+  m[i] = [128]byte{}
+ }
+ printMemAlloc()
+
+ for i := 0; i < n; i++ { 
+  delete(m, i)
+ }
+
+ runtime.GC()
+ printMemAlloc()
+ runtime.KeepAlive(m)
+}
+
+func printMemAlloc() {
+ var m runtime.MemStats
+ runtime.ReadMemStats(&m)
+ fmt.Printf("%d KB\n", m.Alloc/1024)
+}
+```
+
+We allocate an empty map, add 1 million elements, remove 1 million elements, and then run a GC. We also make sure to keep a reference to the map using runtime.KeepAlive so that the map isn’t collected as well. This will produce a output as below.
+
+//Output
+93 KB
+464105 KB //After adding 1 million elements
+300425 KB //After deleting 1 million elements
+At first, the heap size is minimum. Then it grows significantly after having added 1 million elements to the map. But if we expected the heap size to decrease after removing all the elements, this isn’t how maps work in Go. In the end, even though the GC has collected all the elements, the heap size is still 300 MB. So the memory shrunk, but not as we might have expected.
+
+A map provides an unordered collection of key-value pairs in which all the keys are distinct. In Go, a map is based on the hash table data structure: an array where each element is a pointer to a bucket of key-value pairs, as shown in the figure.
+
+
+Each bucket is a fixed-size array of eight elements. In the case of an insertion into a bucket that is already full (a bucket overflow), Go creates another bucket of eight elements and links the previous one to it.
+
+
+A Go map is a pointer to a runtime.hmap struct. This struct contains multiple fields, including a B field, giving the number of buckets in the map:
+```go
+type hmap struct {
+    B uint8 // log_2 of # of buckets
+            // (can hold up to loadFactor * 2^B items)
+    // ...
+}
+```
+After adding 1 million elements, the value of B equals 18, which means 2 pow 18 = 262,144 buckets. When we remove 1 million elements, what’s the value of B? Still 18. Hence, the map still contains the same number of buckets.
+
+The reason is that the number of buckets in a map cannot shrink. Therefore, removing elements from a map doesn’t impact the number of existing buckets; it just zeroes the slots in the buckets. A map can only grow and have more buckets; it never shrinks.
+
+What are the solutions if we don’t want to manually restart our service to clean the amount of memory consumed by the map? One solution could be to re-create a copy of the current map at a regular pace. For example, every hour, we can build a new map, copy all the elements, and release the previous one. The main drawback of this option is that following the copy and until the next garbage collection, we may consume twice the current memory for a short period.
+
+Another solution would be to change the map type to store an array pointer: map[int]*[128]byte. It doesn’t solve the fact that we will have a significant number of buckets; however, each bucket entry will reserve the size of a pointer for the value instead of 128 bytes (8 bytes on 64-bit systems and 4 bytes on 32-bit systems).
+
+If a key or a value is over 128 bytes, Go won’t store it directly in the map bucket. Instead, Go stores a pointer to reference the key or the value.
+
+As we have seen, adding n elements to a map and then deleting all the elements means keeping the same number of buckets in memory. So, we must remember that because a Go map can only grow in size, so does its memory consumption. There is no automated strategy to shrink it. If this leads to high memory consumption, we can try different options such as forcing Go to re-create the map or using pointers to check if it can be optimized.
+
+If you like this post, please do like and add your comments and follow my page for more go related blogs.
+
+https://medium.com/@quicktechlearn/go-an-evolving-language-in-this-modern-era-b5d4e58dd838
+https://medium.com/@quicktechlearn/how-slices-affect-the-performance-of-your-code-in-go-how-can-they-be-mitigated-9e6f3d90e2e6
+https://medium.com/@quicktechlearn/how-to-sync-goroutines-in-go-how-to-use-wait-groups-7fef6741950
