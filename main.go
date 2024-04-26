@@ -38,6 +38,11 @@ func main() {
 
 	c := cache.New(30*time.Minute, 50*time.Minute)
 
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello, World!")
+
+	})
+
 	mux.HandleFunc("GET /image/", func(w http.ResponseWriter, r *http.Request) {
 		defer timer("image conversion")()
 		fmt.Println("Hit endpoint /image/")
@@ -119,9 +124,13 @@ func main() {
 		json.NewEncoder(w).Encode(p)
 	})
 
-	port := "8090"
+	port := "8080"
 	fmt.Printf("Starting server on port %v\n", port)
-	http.ListenAndServe("localhost:"+port, mux)
+	err := http.ListenAndServe("0.0.0.0:"+port, mux)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Can't listen on port %q: %s", port, err)
+		os.Exit(1)
+	}
 }
 
 func downloadImage(p string) (string, error) {

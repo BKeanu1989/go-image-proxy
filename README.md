@@ -26,6 +26,7 @@ Serve a "native" version as well.
     - URL Signing
     - link rel=preconnect
     - http2
+    - check port -> use another if necessary
 
 ## Done
 
@@ -42,6 +43,58 @@ Serve a "native" version as well.
 The imgproxy URL in this example is not signed but signing URLs is especially important when using encrypted source URLs to prevent a padding oracle attack.
 ```
 
+---
+## Building
+```
+GOOS=linux GOARCH=amd64 go build -o bin/app-amd64-linux app.go # 64-bit
+```
+-> 
+```
+# linux
+set GOOS=linux
+set GOARCH=amd64
+
+go build -o bin/app-amd64-linux
+
+# windows
+set GOOS=windows
+set GOARCH=amd64
+
+go build -o bin/app-amd64.exe 
+
+```
+# ./app-amd64-linux
+```txt
+/bin/sh: 8: ./app-amd64-linux: Exec format error
+```
+
+https://stackoverflow.com/questions/36279253/go-compiled-binary-wont-run-in-an-alpine-docker-container-on-ubuntu-host
+
+-
+https://www.digitalocean.com/community/tutorials/how-to-build-go-executables-for-multiple-platforms-on-ubuntu-20-04
+linux/386
+linux/amd64
+linux/arm
+linux/arm64
+linux/mips
+linux/mips64
+linux/mips64le
+linux/mipsle
+linux/ppc64
+linux/ppc64le
+linux/riscv64
+linux/s390x
+
+uname -a
+Linux a056130fca28 6.6.12-linuxkit #1 SMP PREEMPT_DYNAMIC Fri Jan 19 12:50:23 UTC 2024 x86_64 GNU/Linux
+
+dpkg --print-architecture
+amd64
+
+file ./app-amd64-linux
+./app-amd64-linux: PE32+ executable (console) x86-64, for **MS Windows**
+
+use command line with admin and set goos again
 
 ---
 TODO: 

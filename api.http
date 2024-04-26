@@ -1,1 +1,8 @@
 GET http://localhost:8090/health HTTP/1.1
+
+
+# docker
+###
+
+GET http://0.0.0.0:80/health HTTP/1.1
+
