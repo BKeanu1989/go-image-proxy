@@ -27,6 +27,7 @@ Serve a "native" version as well.
     - link rel=preconnect
     - http2
     - check port -> use another if necessary
+    - base64 encoded images, put into media library of wp?
 
 ## Done
 
