@@ -31,7 +31,7 @@ import (
 
 // http://localhost:8090/images?url=http://kunststoffplattenprofis.de/&w=500&h=500&q=80
 
-// http://localhost:8090/image/?url=https://kunststoffplattenprofis.de/wp-content/uploads/2021/10/Titel-Test1.png&w=500&h=500&q=4
+// http://localhost:8080/image/?url=https://kunststoffplattenprofis.de/wp-content/uploads/2021/10/Titel-Test1.png&w=500&h=500&q=4
 // http://localhost:8090/image/?url=http://localhost:8080/wp-content/uploads/2022/07/Tobias-Kasimirowicz_%C2%A9Jacqueline-Schulz-9.jpg&w=215q=80&f=jpeg
 func main() {
 	mux := http.NewServeMux()

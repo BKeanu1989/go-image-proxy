@@ -15,3 +15,17 @@ try {
   }
 }
 ```
+
+# how to handle responsiveness?
+
+# What about base64 encoded images?
+in general +30% file size compared to png / jpeg
+
+
+---
+what data is needed?
+
+- width, height, format, quality, original_url
+- srcset?
+
+
