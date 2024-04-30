@@ -3,6 +3,7 @@ module example.com/image-proxy
 go 1.22.2
 
 require (
+	github.com/a-h/templ v0.2.663 // indirect
 	github.com/anthonynsimon/bild v0.13.0 // indirect
 	github.com/disintegration/imaging v1.6.2 // indirect
 	github.com/hhrutter/lzw v1.0.0 // indirect

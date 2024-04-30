@@ -18,6 +18,10 @@ import (
 	"time"
 
 	"example.com/image-proxy/myimage"
+	"example.com/image-proxy/view"
+	"example.com/image-proxy/view/layout"
+	"example.com/image-proxy/view/partial"
+	"github.com/a-h/templ"
 	"github.com/patrickmn/go-cache"
 	"github.com/sunshineplan/imgconv"
 )
@@ -38,10 +42,18 @@ func main() {
 
 	c := cache.New(30*time.Minute, 50*time.Minute)
 
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, World!")
+	cmp := layout.Base(view.Index())
+	mux.Handle("/", templ.Handler(cmp))
 
-	})
+	mux.Handle("/foo", templ.Handler(partial.Foo()))
+	// mux.HandleFunc("GET /", templ.Handler(cmp))
+
+	// mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+	// 	fmt.Fprintf(w, "Hello, World!")
+
+	// })
+
+	// http.Handle("GET /", templ.Handler(comp))
 
 	mux.HandleFunc("GET /image/", func(w http.ResponseWriter, r *http.Request) {
 		defer timer("image conversion")()

@@ -1,0 +1,15 @@
+package view
+
+templ Index() {
+	<header>
+		<h1 class="text-center text-3xl font-bold">
+			Hello, World
+		</h1>
+	</header>
+	<div class="flex justify-center mt-10">
+		<!-- HTMX here -->
+		<button hx-get="/foo" class="btn bg-teal-200 p-4 rounded-lg">
+			FOO
+		</button>
+	</div>
+}
