@@ -109,3 +109,28 @@ func UrlParser(path string) MyOptions {
 	return opt
 
 }
+
+// http://localhost:8080/render/?url=https://kunststoffplattenprofis.de/wp-content/uploads/2021/10/Titel-Test1.png&f=jpeg&s=100
+func UrlParserForRendering(p string) MyRenderOptios {
+	var s int
+
+	myUrl, _ := url.Parse(p)
+	params, _ := url.ParseQuery(myUrl.RawQuery)
+	if val, ok := params["s"]; ok {
+		sv, err := strconv.Atoi(val[0])
+		// fmt.Printf("quality is %d", qv)
+		if err == nil {
+			s = sv
+		} else {
+			s = 0
+		}
+	}
+
+	opt := MyRenderOptios{
+
+		// MyOptions: ,
+		// Width: 400,
+		// MyOptions: ,
+	}
+
+}

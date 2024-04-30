@@ -23,7 +23,7 @@ func Index() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header><h1 class=\"text-center text-3xl font-bold\">Hello, World</h1></header><div class=\"flex justify-center mt-10\"><!-- HTMX here --><button hx-get=\"/foo\" class=\"btn bg-teal-200 p-4 rounded-lg\">FOO</button></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<header><h1 class=\"text-center text-3xl font-bold\">Hello, World</h1></header><div class=\"flex justify-center mt-10\" style=\"margin-top: 1500px;\"><!-- HTMX here --><button hx-get=\"/foo\" hx-trigger=\"revealed\" class=\"btn bg-teal-200 p-4 rounded-lg\">FOO</button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
