@@ -29,6 +29,10 @@ Serve a "native" version as well.
     - check port -> use another if necessary
     - base64 encoded images / go process put into media library of wp?
     - preferred data usage 
+        - This is clever because remember that we have the media attribute on the <source> element. So, we can instruct browsers to use certain images when working with <picture>, a la: <source srcset="small.jpg" media="(prefers-reduced-data: reduce)" />.
+    - wenn html antwort (htmx) -> alt text übernehmen
+    
+     
 
 ## Done
 
