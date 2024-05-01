@@ -32,7 +32,8 @@ Serve a "native" version as well.
         - This is clever because remember that we have the media attribute on the <source> element. So, we can instruct browsers to use certain images when working with <picture>, a la: <source srcset="small.jpg" media="(prefers-reduced-data: reduce)" />.
     - wenn html antwort (htmx) -> alt text übernehmen
 
-    - read img src and replace/edit in load event? is that early enough? -> blocking script in header with window.addEventListener...  
+    - read img src and replace/edit in load event? is that early enough? -> blocking script in header with window.addEventListener...
+    - what about output buffering?  
 
 ## Done
 

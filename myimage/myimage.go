@@ -28,6 +28,12 @@ type MyOptions struct {
 	Format string
 }
 
+type MyRenderOptios struct {
+	Quality int
+	Format  string
+	Steps   int
+}
+
 func (opts MyOptions) GetFileName() string {
 
 	base := path.Base(opts.OriginalUrl)
@@ -127,10 +133,14 @@ func UrlParserForRendering(p string) MyRenderOptios {
 	}
 
 	opt := MyRenderOptios{
-
+		Quality: 80,
+		Format:  "jpeg",
+		Steps:   s,
 		// MyOptions: ,
 		// Width: 400,
 		// MyOptions: ,
 	}
+
+	return opt
 
 }
