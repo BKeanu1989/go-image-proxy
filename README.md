@@ -33,7 +33,12 @@ Serve a "native" version as well.
     - wenn html antwort (htmx) -> alt text übernehmen
 
     - read img src and replace/edit in load event? is that early enough? -> blocking script in header with window.addEventListener...
-    - what about output buffering?  
+    - what about output buffering?
+    - service worker - for proxying requests - in general, without changing db / global, 
+        - possibility for removing service worker - if images are not working
+        - can i use: https://caniuse.com/?search=service%20worker - good support
+
+    - data-src in js
 
 ## Done
 

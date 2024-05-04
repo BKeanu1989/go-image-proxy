@@ -1,12 +1,11 @@
 console.log("peak2labs js workingd");
 
-let controller = new AbortController();
-setTimeout(() => controller.abort(), 10000);
-
 (async function () {
   try {
+    let controller = new AbortController();
+    setTimeout(() => controller.abort(), 10000);
     // let response = await fetch("http://localhost:8090/health", {
-    let response = await fetch("http://localhost:3000", {
+    let response = await fetch("http://localhost:8080", {
       signal: controller.signal,
       mode: "no-cors",
     });
