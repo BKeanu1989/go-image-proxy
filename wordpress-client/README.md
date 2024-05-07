@@ -70,3 +70,10 @@ The @ symbol before $dom->loadHTML($htmlContent) is used to suppress warnings ab
 This approach assumes that the shortcode you're converting to HTML will result in <img> tags. If your shortcode generates other types of content, you may need to adjust the code to target the specific elements you're interested in.
 Remember to replace [your_shortcode_here] with the actual shortcode you're working with.
 
+---
+Plugin hooks:
+```php
+
+// 2 arguments are: proxy "imaged" - version as string html element (img), old avada image as backup   
+add_filter('peak2_image_proxy_avada_html', 'yourfunc', 10,2);
+```

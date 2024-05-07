@@ -200,3 +200,6 @@ function peak2_avada_test($html, $args) {
     $peak2_image = new Peak2_Image_Proxy_Avada($html);
     return $peak2_image->as_html();
 }
+
+// test
+// von go image proxy
