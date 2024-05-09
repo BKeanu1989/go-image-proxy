@@ -249,3 +249,61 @@ networks:
             config:
                 - subnet: "192.168.92.0/24"
 ```
+---
+# cli tool
+
+## imagify
+- converts image 
+- sets
+    - quality
+    - width
+    - height
+        - aspect ratio
+    
+
+
+---
+# installing docker on rp4 for zero trust cloudlfare
+
+ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+
+
+ InRelease: The following signatures couldn't be verified because the public key is not available: https://download.docker.com/linux/raspbian bookworm 
+
+```txt
+W: GPG error: https://download.docker.com/linux/raspbian bookworm InRelease: The following signatures couldn't be verified because the public key is not available: NO_PUBKEY 7EA0A9C3F273FCD8
+E: The repository 'https://download.docker.com/linux/raspbian bookworm InRelease' is not signed.
+N: Updating from such a repository can't be done securely, and is therefore disabled by default.
+N: See apt-secure(8) manpage for repository creation and user configuration details.
+```
+
+source:
+https://stackoverflow.com/questions/60137344/docker-how-to-solve-the-public-key-error-in-ubuntu-while-installing-docker
+
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 7EA0A9C3F273FCD8
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 7EA0A9C3F273FCD8
+
+----
+afer reinstalling ubuntu os on rp4 -> same error
+
+docker run cloudflare/cloudflared:latest tunnel --no-autoupdate run --token eyJhIjoiNGNkNjA1NjBmYWI4NzRhYzdmZDhkODFhMzRiYWU2OTEiLCJ0IjoiZGNlZGZjNmItYzlhOS00NzcwLTg2YjAtYTE2MmIyY2JmMTJmIiwicyI6IlpUUXdNelk0TTJJdFlUVmlZeTAwT0dObExXSTFaVGN0TWpOa00ySmtZemMzT1RjeiJ9
+
+
+--- 
+connector is active
+
+but getting error now:
+```txt
+2024-05-09T13:03:15Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp [::1]:8080: connect: connection refused" connIndex=2 dest=http://image.kevin-fechner.site/ 
+event=0 ip=198.41.192.77 type=http
+```
+
+https://community.cloudflare.com/t/tunnel-unable-to-reach-the-origin-service/450596
+
+```
+You need to replace localhost with host.docker.internal.
+```
+2024-05-09T13:09:21Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp: lookup host.docker.internal on 192.168.0.1:53: no such host" connIndex=2 dest=http://image.kevin-fechner.site/ event=0 ip=198.41.192.77 type=http
+
+-> apparently, the go service needs to be in a docker compose setup, with cloudflare tunnel image
