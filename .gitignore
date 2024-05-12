@@ -4,3 +4,4 @@ out/**
 
 _backup.php
 
+*.env

@@ -307,3 +307,28 @@ You need to replace localhost with host.docker.internal.
 2024-05-09T13:09:21Z ERR Request failed error="Unable to reach the origin service. The service may be down or it may not be responding to traffic from cloudflared: dial tcp: lookup host.docker.internal on 192.168.0.1:53: no such host" connIndex=2 dest=http://image.kevin-fechner.site/ event=0 ip=198.41.192.77 type=http
 
 -> apparently, the go service needs to be in a docker compose setup, with cloudflare tunnel image
+
+
+https://keestalkstech.com/2023/01/expose-docker-compose-app-with-a-secure-cloudflare-tunnel/
+
+```yaml
+version: "3"
+services:
+  web:
+    image: nginx:latest
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html
+    restart: always
+    container_name: web
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
+    env_file: tunnel.env
+    restart: always
+    container_name: tunnel
+    depends_on:
+      - web
+
+```
+

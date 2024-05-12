@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.22.2 as build
+FROM golang:latest as build
 
 # Set destination for COPY
 WORKDIR /app
@@ -14,9 +14,12 @@ RUN go mod download
 # COPY *.go ./
 COPY main.go ./
 COPY myimage ./myimage/
+COPY view ./view
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o go-image-proxy
+RUN go build -o go-image-proxy
+# RUN GOOS=linux go build -o go-image-proxy
+# RUN CGO_ENABLED=0 GOOS=linux go build -o go-image-proxy
 
 
 # Use a Docker multi-stage build to create a lean production image.
