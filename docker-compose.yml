@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  image_proxy:
+    image: Dockerfile
+    restart: always
+    container_name: image_proxy
+
+  tunnel:
+    image: cloudflared/cloudflared:latest
+    command: tunnel --no-autoupdate run
+    env_file:
+      - tunnel.env
+    restart: always
+    container_name: tunnel
+    depends_on:
+      - image_proxy
