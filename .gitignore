@@ -5,3 +5,4 @@ out/**
 _backup.php
 
 *.env
+!tunnel-example.env
