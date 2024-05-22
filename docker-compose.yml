@@ -2,7 +2,7 @@ version: '3'
 
 services:
   image_proxy:
-    image: Dockerfile
+    image: image-proxy:latest
     restart: always
     container_name: image_proxy
 

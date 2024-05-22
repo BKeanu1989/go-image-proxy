@@ -143,6 +143,7 @@ func main() {
 
 	port := "8080"
 	fmt.Printf("Starting server on port %v\n", port)
+	// err := http.ListenAndServe("localhost:"+port, mux)
 	err := http.ListenAndServe("0.0.0.0:"+port, mux)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Can't listen on port %q: %s", port, err)
@@ -151,12 +152,16 @@ func main() {
 }
 
 func downloadImage(p string) (string, error) {
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
 	ext := path.Ext(p)
 	tmpFileName := "./base/" + strings.Replace(base64Encode(p), "/", "", -1) + "." + ext
 	if ext == "" {
 		log.Fatal("No Extension seen in request url")
 	}
-	response, err := http.Get(p)
+	// error fetching image in app
+	response, err := client.Get(p)
 	if err != nil {
 		fmt.Println("Error fetching image:", err)
 		return "", err

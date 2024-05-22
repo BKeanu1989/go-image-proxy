@@ -7,7 +7,7 @@
 
  class Peak2_Image_Proxy_Avada 
  {
-     const IMAGE_PROXY_URL_PREFIX = "http://localhost:8080/image/?url=";
+     const IMAGE_PROXY_URL_PREFIX = "http://localhost:80/image/?url=";
      protected $url;
      protected $defaultQuality = 80;
      protected $defaultImageFormat = ".jpeg"; // for image conversion & jpeg for quality adaption as default
@@ -26,7 +26,7 @@
             //code...
             error_log("we are here right?");
             $this->avada_image = $avada_image;
-    
+            $this->parse_options();
            $this->parse_image_src($this->avada_image);
            $this->parse_srcsets($this->avada_image);
    
@@ -41,7 +41,16 @@
  
      public static function block_any_work($avada_image) {
         // search for strings like deactivate-peak2, for example a class
-         return false;
+        // $reg = 'class=\"(peak2-ignore)\"/m';
+        if (str_contains( $avada_image, "peak-ignore" )) {
+            error_log("BLOCK ANY WORK");
+            return true;
+        }
+        return false;
+     }
+
+     public static function parse_options() {
+
      }
      
      /**
@@ -54,8 +63,8 @@
          $re = '/src=\"((.*)(.png|.jpeg|.jpg|.webp))\"/m';
      
          preg_match_all($re, $html, $matches, PREG_SET_ORDER, 0);
-         error_log("img src result");
-         error_log(print_r($matches,1));
+        //  error_log("img src result");
+        //  error_log(print_r($matches,1));
          $this->oldSrc = $matches[0][1];
          $this->imageBase = $matches[0][2];
          $this->oldImgFormat = $matches[0][3];
@@ -98,7 +107,7 @@
      }
 
      protected function set_new_src() {
-        error_log(print_r($_SERVER, 1));
+        // error_log(print_r($_SERVER, 1));
         $str = "";
         
         $opts = new Peak2_Image_Proxy_Options();
@@ -113,7 +122,7 @@
         $count = count($this->data);
 
         foreach ($this->data as $key => $x) {
-            error_log(print_r($x, 1));
+            // error_log(print_r($x, 1));
             $defaultOpts = new Peak2_Image_Proxy_Options(80, ".jpeg",$x["width"]);
             $str .= self::IMAGE_PROXY_URL_PREFIX . $x["url"] . $defaultOpts->as_string() . " " . $x["width"] . "w";             
             error_log("string now: $str");
@@ -121,8 +130,8 @@
                 $str .= ", ";
             }
         }
-        error_log("new srcset: ");
-        error_log($str);
+        // error_log("new srcset: ");
+        // error_log($str);
         $this->newSrcSetsString = $str;
         // return $str;
      }
@@ -151,8 +160,8 @@
         
         
         $output = apply_filters("peak2_image_proxy_avada_html", $replaced_img_p1, $this->avada_image);
-        error_log("output");
-        error_log($output);
+        // error_log("output");
+        // error_log($output);
         return $output;
      }
  }
@@ -174,6 +183,14 @@
 
      public function get_format() {
         return $this->format;
+     }
+
+     public function set_width($payload) {
+        $this->width = $payload;
+     }
+
+     public function set_heigth($payload) {
+        $this->heigth = $payload;
      }
  
      /**
@@ -198,8 +215,11 @@
 function peak2_avada_test($html, $args) {
     // return $html;
     $peak2_image = new Peak2_Image_Proxy_Avada($html);
-    return $peak2_image->as_html();
-}
+    $output = $peak2_image->as_html();
 
-// test
-// von go image proxy
+    $wp_instance_ip = "http://kunststoffplattenprofisde-go_image_proxy-1";
+    $val = str_replace(site_url(), $wp_instance_ip, $output);
+    // error_log("val:");
+    // error_log($val);
+    return $val;
+}
