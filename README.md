@@ -332,3 +332,87 @@ services:
 
 ```
 
+----
+# Docker
+
+When packaging your application into a Dockerfile and configuring it to listen on a specific IP address, using `0.0.0.0` is generally a good practice. This setting makes your application listen on all available network interfaces, including the loopback interface (localhost). It's particularly useful in Docker environments because it allows your containerized application to accept connections from outside the container, such as from other containers within the same Docker network or from the host machine itself.
+
+However, if you specifically want to bind your application to a certain IP address within the Docker network, you can do so by specifying the desired IP address in your Dockerfile or during runtime. Here's how you can handle both scenarios:
+
+### Binding to All Interfaces (`0.0.0.0`)
+
+If you're okay with your application listening on all interfaces, you typically don't need to specify an IP address in your Dockerfile. Instead, you configure your application to listen on `0.0.0.0`. This is common for web servers and applications that need to be accessible from outside the container.
+
+Example for a Node.js Express app:
+
+```Dockerfile
+FROM node:14
+WORKDIR /usr/src/app
+COPY package*.json./
+RUN npm install
+COPY..
+EXPOSE 8080
+CMD ["node", "server.js"]
+```
+
+In `server.js`, you'd set up your server to listen on `0.0.0.0`:
+
+```javascript
+const express = require('express');
+const app = express();
+const port = 8080;
+
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server running on port ${port}`);
+});
+```
+
+### Binding to a Specific IP Address
+
+If you need to bind your application to a specific IP address within the Docker network, you can either specify this in your application's configuration or use Docker's networking features to assign a static IP to your container.
+
+To assign a static IP to a container, you can use the `--ip` flag when connecting a container to a network:
+
+```bash
+docker network connect --ip 10.10.36.122 my_network my_container
+```
+
+Or, if you're defining your network in a `docker-compose.yml` file, you can specify the `ipv4_address` for your service:
+
+```yaml
+version: '3'
+services:
+  my_service:
+    image: my_image
+    networks:
+      my_network:
+        ipv4_address: 10.10.36.122
+networks:
+  my_network:
+    driver: bridge
+```
+
+In your application, you would then configure it to listen on the specific IP address you've assigned to it within the Docker network.
+
+Remember, the choice between binding to `0.0.0.0` and a specific IP address depends on your application's requirements and how you intend to access it within your Docker environment.
+
+Citations:
+[1] https://docs.docker.com/network/#:~:text=By%20default%2C%20the%20container%20gets,default%20subnet%20mask%20and%20gateway.
+[2] https://docs.docker.com/network/network-tutorial-standalone/
+[3] https://www.freecodecamp.org/news/how-to-get-a-docker-container-ip-address-explained-with-examples/
+[4] https://stackoverflow.com/questions/17157721/how-to-get-a-docker-containers-ip-address-from-the-host
+[5] https://docs.docker.com/reference/cli/docker/network/connect/
+[6] https://www.reddit.com/r/docker/comments/1916gof/how_to_use_static_ips_to_reach_container/
+[7] https://serverfault.com/questions/958367/how-do-i-give-a-docker-container-its-own-routable-ip-on-the-original-network
+[8] https://www.baeldung.com/ops/docker-assign-static-ip-container
+[9] https://kodekloud.com/blog/get-docker-container-ip/
+[10] https://www.reddit.com/r/docker/comments/r9k4y0/how_do_i_run_a_container_with_an_ip_on_my_host/
+
+
+---
+host.docker.internal
+
+---
+https://docs.docker.com/language/golang/build-images/
+
+
