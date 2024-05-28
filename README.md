@@ -287,7 +287,7 @@ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 7EA0A9C3F273FCD8
 ----
 afer reinstalling ubuntu os on rp4 -> same error
 
-docker run cloudflare/cloudflared:latest tunnel --no-autoupdate run --token eyJhIjoiNGNkNjA1NjBmYWI4NzRhYzdmZDhkODFhMzRiYWU2OTEiLCJ0IjoiZGNlZGZjNmItYzlhOS00NzcwLTg2YjAtYTE2MmIyY2JmMTJmIiwicyI6IlpUUXdNelk0TTJJdFlUVmlZeTAwT0dObExXSTFaVGN0TWpOa00ySmtZemMzT1RjeiJ9
+docker run cloudflare/cloudflared:latest tunnel --no-autoupdate run --token YOURTOKENGOESHERE
 
 
 --- 
@@ -415,4 +415,5 @@ host.docker.internal
 ---
 https://docs.docker.com/language/golang/build-images/
 
-
+---
+https://bitbysystems.com/cloudflare-tunnels-docker/

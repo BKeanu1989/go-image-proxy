@@ -1,11 +1,20 @@
 <?php
 /*
  * Plugin Name: Peak 2 Labs Image Proxy
+ * Description: Hello sir
  */
 
  //     $str = '<div class="imageframe-align-center"><span class=" fusion-imageframe imageframe-dropshadow imageframe-39 hover-type-none" style="-webkit-box-shadow: 0px 0px 4px rgba(0,0,0,0.3);box-shadow: 0px 0px 4px rgba(0,0,0,0.3);"><img width="800" height="400" alt="Trespa" title="ka4463" src="http://localhost:3333/wp-content/uploads/2023/03/ka4463.png" class="img-responsive wp-image-35251" srcset="http://localhost:3333/wp-content/uploads/2023/03/ka4463-200x100.png 200w, http://localhost:3333/wp-content/uploads/2023/03/ka4463-400x200.png 400w, http://localhost:3333/wp-content/uploads/2023/03/ka4463-600x300.png 600w, http://localhost:3333/wp-content/uploads/2023/03/ka4463.png 800w" sizes="(max-width: 800px) 100vw, 600px" /></span></div>';
 
- class Peak2_Image_Proxy_Avada 
+define('PEAK2LABS_IMAGE_PROXY_PLUGIN_PATH', WP_PLUGIN_DIR . '/peak2labs-image-proxy/');
+// require_once PEAK2LABS_IMAGE_PROXY_PLUGIN_PATH . 'settings.php';
+// require_once PEAK2LABS_IMAGE_PROXY_PLUGIN_PATH . 'menu.php';
+require_once PEAK2LABS_IMAGE_PROXY_PLUGIN_PATH . 'options.php';
+
+
+
+// error_log("init peak 2 labs image proxy");
+class Peak2_Image_Proxy_Avada 
  {
      const IMAGE_PROXY_URL_PREFIX = "http://localhost:80/image/?url=";
      protected $url;
@@ -24,7 +33,7 @@
      public function __construct($avada_image) {
          try {
             //code...
-            error_log("we are here right?");
+            // error_log("we are here right?");
             $this->avada_image = $avada_image;
             $this->parse_options();
            $this->parse_image_src($this->avada_image);
@@ -125,7 +134,7 @@
             // error_log(print_r($x, 1));
             $defaultOpts = new Peak2_Image_Proxy_Options(80, ".jpeg",$x["width"]);
             $str .= self::IMAGE_PROXY_URL_PREFIX . $x["url"] . $defaultOpts->as_string() . " " . $x["width"] . "w";             
-            error_log("string now: $str");
+            // error_log("string now: $str");
             if ($key !== $count) {
                 $str .= ", ";
             }
@@ -211,9 +220,10 @@
      }
  }
 
- add_filter( 'fusion_element_image_content', 'peak2_avada_test', 999, 2);
+add_filter( 'fusion_element_image_content', 'peak2_avada_test', 999, 2);
 function peak2_avada_test($html, $args) {
     // return $html;
+    error_log("avada image hook");
     $peak2_image = new Peak2_Image_Proxy_Avada($html);
     $output = $peak2_image->as_html();
 
@@ -221,5 +231,16 @@ function peak2_avada_test($html, $args) {
     $val = str_replace(site_url(), $wp_instance_ip, $output);
     // error_log("val:");
     // error_log($val);
-    return $val;
+    return $html;
 }
+
+add_action('admin_init', 'foo_test');
+add_action( 'admin_menu', 'foo_test' );
+
+function foo_test() {
+    error_log("settings options included");
+
+}
+// cronjob for testing health of image proxy regularly
+// settings for site url of image proxy
+// safety token 

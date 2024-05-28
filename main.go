@@ -60,7 +60,8 @@ func main() {
 
 	// http.Handle("GET /", templ.Handler(comp))
 
-	mux.HandleFunc("GET /image/", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/image", func(w http.ResponseWriter, r *http.Request) {
+		// mux.HandleFunc("GET /image/", func(w http.ResponseWriter, r *http.Request) {
 		defer timer("image conversion")()
 		fmt.Println("Hit endpoint /image/")
 		fmt.Printf("%+v", r.UserAgent())
@@ -135,7 +136,8 @@ func main() {
 
 	})
 
-	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		// mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
 		p := struct{}{}
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(p)
