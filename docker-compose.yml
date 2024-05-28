@@ -1,13 +1,17 @@
-version: '3'
+version: '3.3'
 
 services:
   image_proxy:
     image: image-proxy:latest
     restart: always
     container_name: image_proxy
+    ports:
+      - 8080:8080
+    networks:
+      - cf-tunnel
 
   tunnel:
-    image: cloudflared/cloudflared:latest
+    image: cloudflare/cloudflared:latest
     command: tunnel --no-autoupdate run
     env_file:
       - tunnel.env
@@ -15,3 +19,10 @@ services:
     container_name: tunnel
     depends_on:
       - image_proxy
+    networks:
+      - cf-tunnel
+
+networks:
+  cf-tunnel:
+    # external: true
+    driver: bridge 
