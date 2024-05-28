@@ -15,7 +15,7 @@
 // error_log("init peak 2 labs image proxy");
 class Peak2_Image_Proxy_Avada 
  {
-     const IMAGE_PROXY_URL_PREFIX = "https://local.kevin-fechner.site/image/?url=";
+    //  const IMAGE_PROXY_URL_PREFIX = "https://local.kevin-fechner.site/image/?url=";
      protected $url;
      private $plugin_name;
      private $version;
@@ -27,6 +27,7 @@ class Peak2_Image_Proxy_Avada
      protected $oldSrcSetsString = false;
      protected $oldSrc = false;
      protected $oldImgFormat = false;
+     protected $options = false;
 
      public $newSrcSetsString = false; 
      public $newSrc = false;
@@ -36,6 +37,12 @@ class Peak2_Image_Proxy_Avada
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
+    }
+
+    public static function get_image_proxy_prefix() {
+        $endpoint = Peak2_Image_Proxy_Settings::get_endpoint_option();
+
+        return trailingslashit($endpoint) . "image/?url=";
     }
     
     public function set_image($avada_image) {
@@ -48,25 +55,47 @@ class Peak2_Image_Proxy_Avada
           $this->set_new_src();
           $this->set_new_srcsets();
        } catch (\Throwable $th) {
-           //throw $th;
-           error_log($th->get_message());
+           error_log($th->getMessage());
            return $avada_image;
        }
 
      }
  
      public static function block_any_work($avada_image) {
-        // search for strings like deactivate-peak2, for example a class
-        // $reg = 'class=\"(peak2-ignore)\"/m';
-        if (str_contains( $avada_image, "peak-ignore" )) {
-            error_log("BLOCK ANY WORK");
+        if (str_contains( $avada_image, "peak2-ignore" )) {
             return true;
         }
         return false;
      }
 
-     public static function parse_options() {
+     public function parse_options() {
 
+        // peak2-ignore
+        // peak2-q-90
+        $wantedQuality = $this->parse_quality();
+        $wantedFormat = $this->parse_format();
+        // peak2-f-jpeg
+
+        // peak2-w-400
+        // peak2-h-500
+
+     }
+
+     public function parse_quality() {
+        preg_match('/peak2-q-(\d+)/', $this->avada_image, $matches);
+
+        if (count($matches) > 0) {
+            return $matches[1];
+        }
+     }
+
+     
+     public function parse_format() {
+        preg_match('/peak2-f-(\w+)/', $this->avada_image, $matches);
+
+        if (count($matches) > 0) {
+            return $matches[1];
+        }
      }
      
      /**
@@ -127,7 +156,7 @@ class Peak2_Image_Proxy_Avada
         $str = "";
         
         $opts = new Peak2_Image_Proxy_Options();
-        $str .= self::IMAGE_PROXY_URL_PREFIX . $this->imageBase . $this->oldImgFormat . $opts->as_string();
+        $str .= self::get_image_proxy_prefix() . $this->imageBase . $this->oldImgFormat . $opts->as_string();
         // return $str;
         $this->newSrc = $str;
      }
@@ -140,7 +169,7 @@ class Peak2_Image_Proxy_Avada
         foreach ($this->data as $key => $x) {
             // error_log(print_r($x, 1));
             $defaultOpts = new Peak2_Image_Proxy_Options(80, ".jpeg",$x["width"]);
-            $str .= self::IMAGE_PROXY_URL_PREFIX . $x["url"] . $defaultOpts->as_string() . " " . $x["width"] . "w";             
+            $str .= self::get_image_proxy_prefix() . $x["url"] . $defaultOpts->as_string() . " " . $x["width"] . "w";             
             // error_log("string now: $str");
             if ($key !== $count) {
                 $str .= ", ";

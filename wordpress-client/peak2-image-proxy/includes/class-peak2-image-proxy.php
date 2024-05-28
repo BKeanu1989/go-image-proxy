@@ -80,6 +80,7 @@ class Peak2_Image_Proxy {
 		$this->define_public_hooks();
 		$this->define_avada_image_hook();
 		$this->define_settings_hook();
+		$this->define_cron_listeners();
 	}
 
 	/**
@@ -108,6 +109,7 @@ class Peak2_Image_Proxy {
 
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-peak2-image-proxy-avada.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-peak2-image-proxy-settings.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-peak2-image-proxy-cron.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
@@ -194,6 +196,12 @@ class Peak2_Image_Proxy {
 		$this->loader->add_action('admin_init', $plugin_options, 'register_settings');
 	}
 
+	private function define_cron_listeners() {
+
+		$cron_plugin = new Peak2_Image_Proxy_Cron($this->get_plugin_name(), $this->get_version());
+
+		$this->loader->add_action( "image_proxy_health_check", $cron_plugin, "evaluate_transient");
+	}
 	/**
 	 * Run the loader to execute all of the hooks with WordPress.
 	 *

@@ -14,7 +14,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Peak2Labs Image Proxy
- * Plugin URI:        https://github.com
+ * Plugin URI:        https://github.com/BKeanu1989/go-image-proxy/tree/master/wordpress-client/peak2-image-proxyhttps://github.com/BKeanu1989/go-image-proxy/
  * Description:       Wordpress image proxy connector
  * Version:           1.0.0
  * Author:            Peak2Labs
@@ -80,5 +80,10 @@ function run_peak2_image_proxy() {
 	$plugin = new Peak2_Image_Proxy();
 	$plugin->run();
 
+	
+}
+if (!wp_next_scheduled("image_proxy_health_check")) {
+	error_log("inside block to schedule event");
+	wp_schedule_event( time(), "five_minutes", "image_proxy_health_check");
 }
 run_peak2_image_proxy();

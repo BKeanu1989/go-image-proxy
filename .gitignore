@@ -6,3 +6,5 @@ _backup.php
 
 *.env
 !tunnel-example.env
+
+peak2-image-proxy-backup*
