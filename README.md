@@ -13,8 +13,7 @@ Serve a "native" version as well.
     - 100 go mistakes - book  
 
 ## Todo
-    - Server
-    - Image Conversion & Co
+    - Webp
     - make file
     - libvips?? & or be - docker will solve it
     - Docker image
@@ -22,7 +21,6 @@ Serve a "native" version as well.
     - htmx components?
     - Cloudflare Tunnel with Raspberry Pi
     - Cache Memory Size auto clean
-    - How to build url?
     - URL Signing
     - link rel=preconnect
     - http2
@@ -41,6 +39,9 @@ Serve a "native" version as well.
     - data-src in js
 
 ## Done
+    - How to build url?
+    - Server
+    - Image Conversion & Co
 
 ## Known Issues
 - Quality only available for jpeg
