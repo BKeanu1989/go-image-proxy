@@ -19,8 +19,8 @@ class Peak2_Image_Proxy_Avada
      protected $url;
      private $plugin_name;
      private $version;
-     protected $defaultQuality = 80;
-     protected $defaultImageFormat = ".jpeg"; // for image conversion & jpeg for quality adaption as default
+    //  protected $defaultQuality = 80;
+    //  protected $defaultImageFormat = ".jpeg"; // for image conversion & jpeg for quality adaption as default
      protected $data = [];
      protected $avada_image = false;
      protected $imageBase = false;
@@ -48,7 +48,7 @@ class Peak2_Image_Proxy_Avada
     public function set_image($avada_image) {
         try {
            $this->avada_image = $avada_image;
-           $this->parse_options();
+           $this->parse_options($this->avada_image);
           $this->parse_image_src($this->avada_image);
           $this->parse_srcsets($this->avada_image);
        
@@ -68,21 +68,14 @@ class Peak2_Image_Proxy_Avada
         return false;
      }
 
-     public function parse_options() {
-
-        // peak2-ignore
-        // peak2-q-90
-        $wantedQuality = $this->parse_quality();
-        $wantedFormat = $this->parse_format();
-        // peak2-f-jpeg
-
-        // peak2-w-400
-        // peak2-h-500
-
+     public function parse_options($avada_image) {
+        $wantedQuality = $this->parse_quality($avada_image) ?? Peak2_Image_Proxy_Settings::get_default_quality_option();
+        $wantedFormat = $this->parse_format($avada_image) ?? Peak2_Image_Proxy_Settings::get_default_format_option();
+        $this->options = new Peak2_Image_Proxy_Options($wantedQuality, $wantedFormat);
      }
 
-     public function parse_quality() {
-        preg_match('/peak2-q-(\d+)/', $this->avada_image, $matches);
+     public function parse_quality($avada_image) {
+        preg_match('/peak2-q-(\d+)/', $avada_image, $matches);
 
         if (count($matches) > 0) {
             return $matches[1];
@@ -90,8 +83,8 @@ class Peak2_Image_Proxy_Avada
      }
 
      
-     public function parse_format() {
-        preg_match('/peak2-f-(\w+)/', $this->avada_image, $matches);
+     public function parse_format($avada_image) {
+        preg_match('/peak2-f-(\w+)/', $avada_image, $matches);
 
         if (count($matches) > 0) {
             return $matches[1];
@@ -155,8 +148,8 @@ class Peak2_Image_Proxy_Avada
         // error_log(print_r($_SERVER, 1));
         $str = "";
         
-        $opts = new Peak2_Image_Proxy_Options();
-        $str .= self::get_image_proxy_prefix() . $this->imageBase . $this->oldImgFormat . $opts->as_string();
+        // $opts = new Peak2_Image_Proxy_Options();
+        $str .= self::get_image_proxy_prefix() . $this->imageBase . $this->oldImgFormat . $this->options->as_string();
         // return $str;
         $this->newSrc = $str;
      }
@@ -168,8 +161,10 @@ class Peak2_Image_Proxy_Avada
 
         foreach ($this->data as $key => $x) {
             // error_log(print_r($x, 1));
-            $defaultOpts = new Peak2_Image_Proxy_Options(80, ".jpeg",$x["width"]);
-            $str .= self::get_image_proxy_prefix() . $x["url"] . $defaultOpts->as_string() . " " . $x["width"] . "w";             
+            // $defaultOpts = new Peak2_Image_Proxy_Options(80, ".jpeg",$x["width"]);
+            $this->options->set_width($x["width"]);
+
+            $str .= self::get_image_proxy_prefix() . $x["url"] . $this->options->as_string() . " " . $x["width"] . "w";             
             // error_log("string now: $str");
             if ($key !== $count) {
                 $str .= ", ";
@@ -191,21 +186,8 @@ class Peak2_Image_Proxy_Avada
         }
 
         $replaced_img_p2 = str_replace($this->oldSrcSetsString, $this->newSrcSetsString, $this->avada_image);
-        // error_log("replaced img p2");
-        // error_log($replaced_img_p2);
-
-
         $replaced_img_p1 = str_replace($this->oldSrc,$this->newSrc, $replaced_img_p2);
-        // error_log("replaced image: $replaced_img_p1");
-        //     error_log("old src: $this->oldSrc");
-        // error_log("new src: $this->newSrc");
-        
-        
-        
-        
         $output = apply_filters("peak2_image_proxy_avada_html", $replaced_img_p1, $this->avada_image);
-        // error_log("output");
-        // error_log($output);
         return $output;
     }
 
@@ -231,6 +213,10 @@ class Peak2_Image_Proxy_Avada
          $this->format = str_replace(".", "", $format);
          $this->quality = $quality;
          $this->height = $height;
+     }
+
+     public function set_format($payload) {
+        $this->format = $payload;
      }
 
      public function get_format() {
