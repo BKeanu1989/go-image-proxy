@@ -14,7 +14,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Peak2Labs Image Proxy
- * Plugin URI:        https://github.com/BKeanu1989/go-image-proxy/tree/master/wordpress-client/peak2-image-proxyhttps://github.com/BKeanu1989/go-image-proxy/
+ * Plugin URI:        https://github.com/BKeanu1989/go-image-proxy/tree/master/wordpress-client/peak2-image-proxy
  * Description:       Wordpress image proxy connector
  * Version:           1.0.0
  * Author:            Peak2Labs
