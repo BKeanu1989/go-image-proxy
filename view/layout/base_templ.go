@@ -33,7 +33,7 @@ func Base(children ...templ.Component) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- htmx --><script src=\"https://unpkg.com/htmx.org@1.9.10\"></script></body></html>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- htmx --><span class=\" fusion-imageframe imageframe-none imageframe-1 peak-ignore\" style=\"border:10px solid #ffffff;\"><img fetchpriority=\"high\" decoding=\"async\" width=\"800\" height=\"600\" alt=\"Acrylglas\" title=\"ac23012\" src=\"https://local.kevin-fechner.site/image/?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/ac23012.png&amp;f=jpeg&amp;q=80\" class=\"img-responsive wp-image-32057\" srcset=\"https://local.kevin-fechner.site/image/?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/ac23012-200x150.png&amp;f=jpeg&amp;q=80&amp;w=200 200w, https://local.kevin-fechner.site/image/?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/ac23012-400x300.png&amp;f=jpeg&amp;q=80&amp;w=400 400w, https://local.kevin-fechner.site/image/?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/ac23012-600x450.png&amp;f=jpeg&amp;q=80&amp;w=600 600w, https://local.kevin-fechner.site/image/?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/ac23012.png&amp;f=jpeg&amp;q=80&amp;w=800 800w, \" sizes=\"(max-width: 800px) 100vw, 400px\"></span><script src=\"https://unpkg.com/htmx.org@1.9.10\"></script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
