@@ -122,6 +122,7 @@ class Peak2_Image_Proxy_Avada
          $data = [];
          preg_match('/srcset="([^"]+)"/', $html, $matches);
  
+         if (count($matches) > 0) :
          $srcsetAttribute = $matches[1];
          $this->oldSrcSetsString = $srcsetAttribute;
          $srcsetValues = explode(', ', $srcsetAttribute);
@@ -140,6 +141,7 @@ class Peak2_Image_Proxy_Avada
                  $data[] = $arr;
              }
          }
+        endif;
          $this->data = $data;
         //  return $data;
      }
@@ -185,9 +187,13 @@ class Peak2_Image_Proxy_Avada
             error_log($this->newSrc);
         }
 
-        $replaced_img_p2 = str_replace($this->oldSrcSetsString, $this->newSrcSetsString, $this->avada_image);
-        $replaced_img_p1 = str_replace($this->oldSrc,$this->newSrc, $replaced_img_p2);
+    $replaced_img_p2 = str_replace($this->oldSrcSetsString, $this->newSrcSetsString, $this->avada_image);
+    // error_log("first replace: $replaced_img_p2");
+        $replaced_img_p1 = str_replace('src="' . $this->oldSrc . '"','src="' . $this->newSrc . '"', $replaced_img_p2);
         $output = apply_filters("peak2_image_proxy_avada_html", $replaced_img_p1, $this->avada_image);
+        // error_log("output now: $output");
+        // the last srcset is incorrect: 
+        // <div class="imageframe-align-center"><span class=" fusion-imageframe imageframe-dropshadow imageframe-39 hover-type-none" style="-webkit-box-shadow: 0px 0px 4px rgba(0,0,0,0.3);box-shadow: 0px 0px 4px rgba(0,0,0,0.3);"><img width="800" height="400" alt="Trespa" title="ka4463" src="https://local.kevin-fechner.site/image/?url=http://localhost:3333/wp-content/uploads/2023/03/ka4463.png&f=png&q=20" class="img-responsive wp-image-35251" srcset="https://local.kevin-fechner.site/image/?url=http://localhost:3333/wp-content/uploads/2023/03/ka4463-200x100.png&f=png&q=20&w=200 200w, https://local.kevin-fechner.site/image/?url=http://localhost:3333/wp-content/uploads/2023/03/ka4463-400x200.png&f=png&q=20&w=400 400w, https://local.kevin-fechner.site/image/?url=http://localhost:3333/wp-content/uploads/2023/03/ka4463-600x300.png&f=png&q=20&w=600 600w, https://local.kevin-fechner.site/image/?url=https://local.kevin-fechner.site/image/?url=http://localhost:3333/wp-content/uploads/2023/03/ka4463.png&f=png&q=20&f=png&q=20&w=800 800w, " sizes="(max-width: 800px) 100vw, 600px" /></span></div>
         return $output;
     }
 
