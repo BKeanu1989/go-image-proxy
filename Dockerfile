@@ -32,11 +32,14 @@ WORKDIR /app
 COPY --from=build /app/go-image-proxy .
 RUN mkdir base
 RUN mkdir out
+RUN mkdir logs
 
 RUN apk update
 RUN apk add curl
+# RUN apk add libvips-dev
 
-
+# for bimg image conversion to webp support - not needed yet / rn 
+# RUN apk add --update --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community --repository http://dl-3.alpinelinux.org/alpine/edge/main vips-dev
 
 
 # Optional:

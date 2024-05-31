@@ -2,25 +2,29 @@ version: '3.3'
 
 services:
   image_proxy:
-    image: image-proxy:latest
+    image: 663b50f01a74723a7f3fe134f6abb7ee80dcaa8b32d824029eeaa0a848920a30
     restart: always
     container_name: image_proxy
     ports:
-      - 8080:8080
+      - 4444:8080
     networks:
       - cf-tunnel
+    volumes:
+      - ./dockerlogs:/app/logs
+      - ./docker-base:/app/base
+      - ./docker-out:/app/out
 
-  tunnel:
-    image: cloudflare/cloudflared:latest
-    command: tunnel --no-autoupdate run
-    env_file:
-      - tunnel.env
-    restart: always
-    container_name: tunnel
-    depends_on:
-      - image_proxy
-    networks:
-      - cf-tunnel
+  # tunnel:
+  #   image: cloudflare/cloudflared:latest
+  #   command: tunnel --no-autoupdate run
+  #   env_file:
+  #     - tunnel.env
+  #   restart: always
+  #   container_name: tunnel
+  #   depends_on:
+  #     - image_proxy
+  #   networks:
+  #     - cf-tunnel
 
 networks:
   cf-tunnel:

@@ -22,7 +22,12 @@ import (
 	"example.com/image-proxy/view/layout"
 	"example.com/image-proxy/view/partial"
 	"github.com/a-h/templ"
+
+	// "github.com/h2non/bimg"
+
+	// "github.com/h2non/bimg"
 	"github.com/patrickmn/go-cache"
+	"github.com/sirupsen/logrus"
 	"github.com/sunshineplan/imgconv"
 )
 
@@ -35,10 +40,20 @@ import (
 
 // http://localhost:8090/images?url=http://kunststoffplattenprofis.de/&w=500&h=500&q=80
 
-// http://localhost:8080/image/?url=https://kunststoffplattenprofis.de/wp-content/uploads/2021/10/Titel-Test1.png&w=500&h=500&q=4
-// http://localhost:8080/render/?url=https://kunststoffplattenprofis.de/wp-content/uploads/2021/10/Titel-Test1.png&f=jpeg&s=100
+// http://localhost:4444/image/?url=https://kunststoffplattenprofis.de/wp-content/uploads/2021/10/Titel-Test1.png&w=500&h=500&q=4
+// http://localhost:4444/render/?url=https://kunststoffplattenprofis.de/wp-content/uploads/2021/10/Titel-Test1.png&f=jpeg&s=100
 // http://localhost:8090/image/?url=http://localhost:8080/wp-content/uploads/2022/07/Tobias-Kasimirowicz_%C2%A9Jacqueline-Schulz-9.jpg&w=215q=80&f=jpeg
+// var log = logrus.New()
+
 func main() {
+	f, err := os.OpenFile("./logs/debug.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755)
+
+	if err != nil {
+		fmt.Printf("logger cant open file")
+	}
+	logrus.SetOutput(f)
+
+	logrus.Info("test write to logger")
 	mux := http.NewServeMux()
 
 	c := cache.New(30*time.Minute, 50*time.Minute)
@@ -92,18 +107,27 @@ func main() {
 		if err != nil {
 			fmt.Println("Handle new image")
 			dwlImage, err := downloadImage(opts.OriginalUrl)
+			logrus.Info("downloading image from: ")
+			logrus.Info(opts.OriginalUrl)
+
 			if err != nil {
 				log.Fatal(err)
+				logrus.Warn("cannot download image")
+				logrus.Warn(err)
 			}
 
 			src, err := resizeNQualityImage(dwlImage, opts)
 			if err != nil {
 				log.Fatal(err)
+				logrus.Warn("cannot resize/convert image")
+				logrus.Warn(err)
 			}
 
 			buf, err := os.ReadFile(src)
 			if err != nil {
 				log.Fatal(err)
+				logrus.Warn("cannot read file")
+				logrus.Warn(err)
 			}
 
 			c.Set(opts.GetFileName(), buf, cache.DefaultExpiration)
@@ -146,9 +170,10 @@ func main() {
 	port := "8080"
 	fmt.Printf("Starting server on port %v\n", port)
 	// err := http.ListenAndServe("localhost:"+port, mux)
-	err := http.ListenAndServe("0.0.0.0:"+port, mux)
+	err = http.ListenAndServe("0.0.0.0:"+port, mux)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Can't listen on port %q: %s", port, err)
+		logrus.Warn(fmt.Printf("cant listen on port %s", port))
 		os.Exit(1)
 	}
 }
@@ -161,25 +186,30 @@ func downloadImage(p string) (string, error) {
 	tmpFileName := "./base/" + strings.Replace(base64Encode(p), "/", "", -1) + "." + ext
 	if ext == "" {
 		log.Fatal("No Extension seen in request url")
+		logrus.Warn("no extension provided in request url")
 	}
 	// error fetching image in app
 	response, err := client.Get(p)
 	if err != nil {
 		fmt.Println("Error fetching image:", err)
+		logrus.Warn("error fetching image")
+		logrus.Warn(err)
 		return "", err
 	}
 	defer response.Body.Close()
 
 	file, err := os.Create(tmpFileName)
 	if err != nil {
-		fmt.Println("Error creating file:", err)
+		logrus.Warn("error creating file")
+		logrus.Warn(err)
 		return "", err
 	}
 	defer file.Close()
 
 	_, err = io.Copy(file, response.Body)
 	if err != nil {
-		fmt.Println("Error saving image:", err)
+		logrus.Warn("errir saving image")
+		logrus.Warn(err)
 		return "", err
 	}
 
@@ -187,24 +217,46 @@ func downloadImage(p string) (string, error) {
 }
 
 func resizeNQualityImage(srcPath string, opt myimage.MyOptions) (string, error) {
+
+	logrus.Info("my image options are:")
+	logrus.Info(opt)
+
 	src, err := imgconv.Open(srcPath)
 	var mark image.Image
 	if err != nil {
 		log.Fatalf("failed to open image: %v", err)
+		logrus.Warn("failed top open image")
+		logrus.Warn(err)
 	}
 
 	if opt.Quality != 0 {
 		imgconv.Quality(opt.Quality)
 	}
 
-	if opt.Height != 0.0 {
+	// if opt.Height != 0.0 {
+	// 	if opt.Width != 0.0 {
+	// 		mark = imgconv.Resize(src, &imgconv.ResizeOption{Height: int(opt.Height), Width: int(opt.Width)})
+	// 	} else {
+	// 		mark = imgconv.Resize(src, &imgconv.ResizeOption{Width: int(opt.Width)})
+	// 	}
+	// } else {
+	// 	mark = imgconv.Resize(src, &imgconv.ResizeOption{Width: int(opt.Width)})
+	// }
+
+	if opt.Height != 0.0 && opt.Width != 0.0 {
+		mark = imgconv.Resize(src, &imgconv.ResizeOption{Height: int(opt.Height), Width: int(opt.Width)})
+	} else if opt.Height != 0.0 || opt.Width != 0.0 {
+		dim := imgconv.ResizeOption{}
 		if opt.Width != 0.0 {
-			mark = imgconv.Resize(src, &imgconv.ResizeOption{Height: int(opt.Height), Width: int(opt.Width)})
-		} else {
-			mark = imgconv.Resize(src, &imgconv.ResizeOption{Width: int(opt.Width)})
+			dim.Width = int(opt.Width)
 		}
+		if opt.Height != 0.0 {
+			dim.Height = int(opt.Height)
+		}
+		mark = imgconv.Resize(src, &dim)
 	} else {
-		mark = imgconv.Resize(src, &imgconv.ResizeOption{Width: int(opt.Width)})
+		// is this correct?
+		mark = src
 	}
 
 	// resizedImage := imaging.Resize(src, 300, 200, imaging.Lanczos)
@@ -217,12 +269,33 @@ func resizeNQualityImage(srcPath string, opt myimage.MyOptions) (string, error) 
 	// TODO: support more image formats
 	// err = imgconv.Save(outFile, mark, &imgconv.FormatOption{Format: imgconv.JPEG})
 	if err != nil {
+		logrus.Warn("cannot encode image")
+		logrus.Warn(err)
 		panic(err)
 	}
 
 	return outFile, nil
 
 }
+
+// func resizeNQualityImage_refactored(srcPath string, opt myimage.MyOptions) (string, error) {
+// 	buffer, err := bimg.Read(srcPath)
+// 	if err != nil {
+// 		fmt.Fprintln(os.Stderr, err)
+// 		return "", err
+// 	}
+
+// 	newImage, err := bimg.NewImage(buffer).Convert(bimg.WEBP)
+// 	if err != nil {
+// 		fmt.Fprintln(os.Stderr, err)
+// 		return "", err
+// 	}
+
+// 	outFile := "./out/" + opt.GetFileName()
+// 	bimg.Write(outFile, newImage)
+
+// 	return outFile, nil
+// }
 
 func base64Encode(str string) string {
 	return base64.StdEncoding.EncodeToString([]byte(str))
