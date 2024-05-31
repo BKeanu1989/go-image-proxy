@@ -8,3 +8,10 @@ _backup.php
 !tunnel-example.env
 
 peak2-image-proxy-backup*
+
+
+docker-base
+docker-out
+dockerlogs
+
+debug.log

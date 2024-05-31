@@ -3,7 +3,10 @@ With the help of cloudflare tunnnel it might be possible to host a service for a
 
 Serve a "native" version as well.
 
+---
+https://github.com/h2non/bimg
 
+---
 
 
 # sources for go education
@@ -418,3 +421,27 @@ https://docs.docker.com/language/golang/build-images/
 
 ---
 https://bitbysystems.com/cloudflare-tunnels-docker/
+
+---
+### Debugging responsive images for avada:
+
+
+- https://local.kevin-fechner.site/image/?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/ac23012.png&f=jpeg&q=80&w=800 - not working 
+- https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/ac23012.png - working
+
+
+- https://local.kevin-fechner.site/image/?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/ac23012-400x300.png&f=jpeg&q=80&w=400 - working
+
+
+--> local
+- http://localhost:4444/image/?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/ac23012-400x300.png&f=jpeg&q=80&w=400 - ?
+<!-- - https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/ac23012.png - ? -->
+- http://localhost:4444/image/?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/ac23012.png&f=jpeg&q=80&w=800 - ? 
+
+
+
+<span class=" fusion-imageframe imageframe-none imageframe-2 peak2-f-png" style="border:10px solid #ffffff;"><img decoding="async" width="800" height="600" alt="Alu Verbundplatten" title="av23012" src="https://local.kevin-fechner.site/image/?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/av23012.png&amp;f=png&amp;q=80" class="img-responsive wp-image-32058" srcset="https://local.kevin-fechner.site/image/?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/av23012-200x150.png&amp;f=png&amp;q=80&amp;w=200 200w, https://local.kevin-fechner.site/image/?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/av23012-400x300.png&amp;f=png&amp;q=80&amp;w=400 400w, https://local.kevin-fechner.site/image/?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/av23012-600x450.png&amp;f=png&amp;q=80&amp;w=600 600w, https://local.kevin-fechner.site/image/?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/av23012.png&amp;f=png&amp;q=80&amp;w=800 800w, " sizes="(max-width: 800px) 100vw, 400px"></span>
+
+
+---
+http://localhost:4444/image?url=https://sks.mokka-webdesign.com/wp-content/uploads/2023/01/av23012.png&amp;f=png&amp;q=80
